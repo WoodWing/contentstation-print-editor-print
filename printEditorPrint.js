@@ -1,13 +1,29 @@
 (function() {
-    EditorUiSdk.createAction({
+    let printMenuId = EditorUiSdk.createAction({
         label: 'Print',
+    });    
+
+    EditorUiSdk.createSubAction(printMenuId, {
+        label: 'Print article',
         icon: '',
         click: function() {   
             ContentStationSdk.showNotification({                
                 content: 'The print preview is being generated, one moment please...'
             });
+            
+            printArticle (true);
+        }
+    });
 
-            printArticle ();
+    EditorUiSdk.createSubAction(printMenuId, {
+        label: 'Print compare',
+        icon: '',
+        click: function() {   
+            ContentStationSdk.showNotification({                
+                content: 'The print preview is being generated, one moment please...'
+            });
+            
+            printArticle (false);
         }
     });
 
@@ -35,9 +51,9 @@
     /**
      * Get the article metadata and print the article
      */
-    function printArticle () {
+    function printArticle (articleView) {
         var info = ContentStationSdk.getInfo();
-        var  articleId = window.location.href.substr(window.location.href.lastIndexOf('/') +1);
+        var articleId = window.location.href.substr(window.location.href.lastIndexOf('/') +1);
         var getObjectsRequest = {
             "method": "GetObjects",
             "id": "1",
@@ -64,9 +80,16 @@
         callAjax(info.ServerInfo.URL + "?protocol=JSON&method=GetObjects", getObjectsRequest, function(result) {
             console.log('result', result);
             var header = createHeader(result.result.Objects[0]);
+            var contentSelector;
 
-            $( "article" ).printThis({
-                debug: true,               // show the iframe for debugging
+            if (articleView) {
+                contentSelector =  $( "article-editor article" );
+            } else {
+                contentSelector =   $( "article-compare-content article" );
+            }
+
+            contentSelector.printThis({                
+                debug: false,               // show the iframe for debugging
                 importCSS: true,            // import parent page css
                 importStyle: true,          // import style tags
                 printContainer: true,       // print outer container/$.selector
@@ -76,7 +99,7 @@
                 removeInlineSelector: "*",  // custom selectors to filter inline styles. removeInline must be true
                 printDelay: 333,            // variable print delay
                 header: "<style>img {max-height: 15px;max-width: 15px;}</style> " + header , // prefix to html
-                footer: null,               // postfix to html
+                footer: "",               // postfix to html
                 base: true,                // preserve the BASE tag or accept a string for the URL
                 formValues: true,           // preserve input/form values
                 canvas: false,              // copy canvas content
@@ -153,11 +176,6 @@
         return issues.join (', ');
     }
 })();
-
-
-
-
-
 
 /*
  * printThis v1.14.0
@@ -339,6 +357,8 @@
                 $head.append(this.outerHTML);
             });
 
+            
+
             // add title of the page
             if (opt.pageTitle) $head.append("<title>" + opt.pageTitle + "</title>");
 
@@ -411,8 +431,11 @@
             }
 
             //WoodWing 20190830: Add header to print editor article instead of body
+            //WoodWing 20200108: Overwrite overflow and position to prevent that only the first page is printed 
             $body.find('article').prepend (opt.header);
-
+            $body.find('article').css("overflow", "unset");
+            $body.find('article').css("position", "absolute");
+            
             // print "footer"
             appendContent($body, opt.footer);
 
