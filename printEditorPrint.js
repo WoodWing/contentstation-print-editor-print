@@ -77,8 +77,12 @@
         };
         getObjectsRequest.params[0].IDs.push (articleId);
 
+        //Set ticket for older servers 
+        if (info.Ticket) {
+            getObjectsRequest.params[0].Ticket = info.Ticket; 
+        }        
+
         callAjax(info.ServerInfo.URL + "?protocol=JSON&method=GetObjects", getObjectsRequest, function(result) {
-            console.log('result', result);
             var header = createHeader(result.result.Objects[0]);
             var contentSelector;
 
@@ -97,7 +101,7 @@
                 pageTitle: "",              // add title to print page
                 removeInline: false,        // remove inline styles from print elements
                 removeInlineSelector: "*",  // custom selectors to filter inline styles. removeInline must be true
-                printDelay: 333,            // variable print delay
+                printDelay: 1000,            // variable print delay
                 header: "<style>img {max-height: 15px;max-width: 15px;}</style> " + header , // prefix to html
                 footer: "",               // postfix to html
                 base: true,                // preserve the BASE tag or accept a string for the URL
