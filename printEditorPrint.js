@@ -50,8 +50,8 @@
     async function loadJQuery() {
         // Source: https://code.jquery.com/
         await addScript(
-            'https://code.jquery.com/jquery-3.5.1.min.js',
-            'sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=',
+            'https://code.jquery.com/jquery-3.7.1.min.js',
+            'sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=',
             'anonymous',
         );
         // Ensure that our jQuery dependency is not conflicting with jQuery in the main application.
